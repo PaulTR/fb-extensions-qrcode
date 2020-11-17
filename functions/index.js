@@ -14,17 +14,19 @@ exports.qrcode = functions.firestore.document('/reviews/{documentId}')
       const input = snap.data().qr
       
       if( input ) {
-      	const key = snap.id;
       	const directory = 'images/qr/';//'';
       	const bucketName = '';//'ptruiz-extensions';
-      	const tmpFileLocation = '/tmp/newfile.png';
       	const fileType = 'png';
-      	const destination = directory + key + '.' + fileType;
-		const bucketRef = getBucket(bucketName);
-
+		const qr_code_path = 'path';
       	const cht = (false) ? '' : 'qr';
       	const chs = (false) ? '' : '144x144';
       	const choe = (false) ? '' : 'UTF-8';
+
+		const key = snap.id;
+      	const tmpFileLocation = '/tmp/newfile.png';
+		const destination = directory + key + '.' + fileType;
+      	const bucketRef = getBucket(bucketName);
+
       	var imageUrl = 
 	      	'https://chart.googleapis.com/chart?' +
 	      	'cht=' + cht +
@@ -39,7 +41,7 @@ exports.qrcode = functions.firestore.document('/reviews/{documentId}')
 			    destination: destination,
 			    gzip: true
 			},  function(err, file) {
-			  	snap.ref.set({ "path": "gs://" + bucketRef.name + '/' + destination}, {merge: true});
+			  	snap.ref.set({ [qr_code_path]: "gs://" + bucketRef.name + '/' + destination}, {merge: true});
 				});
 	  		}).then(() => {
       			//write file path to firestore
