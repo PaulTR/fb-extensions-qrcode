@@ -50,7 +50,7 @@ exports.qrcode = functions.firestore.document('/reviews/{documentId}')
     		});
 		});
     }));
-	return Promise.resolve.null;
+	return Promise.resolve(null);
   } else {
   	return Promise.resolve(null);
   }      
