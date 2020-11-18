@@ -84,7 +84,9 @@ const handleDeleteDocument = async (snapshot) => {
 
 const deleteItem = async function(bucketRef, path) {
     console.log("trying to delete");
-    await bucketRef.file(path).delete();
+    await bucketRef.file(path).delete().then(() => {
+        console.log("deleted?");
+    });
 }
 
 const uploadTmpFile = function(snapshot) {
@@ -112,6 +114,11 @@ const handleUpdateDocument = async (before, after) => {
         inputBefore !== undefined) {
             return;
         }
+    if( inputBefore ) {
+        var path = snapshot.get(config_1.default.outputFieldName + "/" + "realtive_path");
+        var bucketRef = getBucket(config_1.default.bucket);
+        await deleteItem(bucketRef, path);
+    }
     if (inputAfter) {
     	var url = createQRCodeUrl(inputAfter);
         downloadFile(url, tmpFileLocation, async function() {
