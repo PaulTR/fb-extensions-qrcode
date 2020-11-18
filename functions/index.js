@@ -35,15 +35,12 @@ exports.fsqrcodegenerator = functions.handler.firestore.document.onWrite(async (
     try {
         switch (changeType) {
             case ChangeType.CREATE:
-                console.log("create");
                 await handleCreateDocument(change.after);
                 break;
             case ChangeType.DELETE:
-                console.log("delete");
                 await handleDeleteDocument(change.before);
                 break;
             case ChangeType.UPDATE:
-                console.log("update");
                 await handleUpdateDocument(change.before, change.after);
                 break;
         }
@@ -77,15 +74,14 @@ const handleCreateDocument = async (snapshot) => {
 };
 
 const handleDeleteDocument = async (snapshot) => {
-	var path = snapshot.get(config_1.default.outputFieldName + "/" + "realtive_path");
+	var path = snapshot.data()[config_1.default.outputFieldName]['relative_path'];
     var bucketRef = getBucket(config_1.default.bucket);
     await deleteItem(bucketRef, path);
 };
 
 const deleteItem = async function(bucketRef, path) {
-    console.log("trying to delete");
-    await bucketRef.file(path).delete().then(() => {
-        console.log("deleted?");
+    await bucketRef.file(path).delete().catch(function(error) {
+      console.log("deleting error: " + error)
     });
 }
 
@@ -115,7 +111,7 @@ const handleUpdateDocument = async (before, after) => {
             return;
         }
     if( inputBefore ) {
-        var path = snapshot.get(config_1.default.outputFieldName + "/" + "realtive_path");
+        var path = snapshot.data()[config_1.default.outputFieldName]['relative_path'];
         var bucketRef = getBucket(config_1.default.bucket);
         await deleteItem(bucketRef, path);
     }

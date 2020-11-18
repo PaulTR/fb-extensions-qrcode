@@ -124,5 +124,5 @@ params:
       In which folder would you like to store your QR code images? (leave empty for default). No leading /, add trailing /
     example: images/qrcodes/
     default:
-    validationRegex: "((?:[^/]*/)*)(.*)"
+    validationRegex: "^[a-zA-Z0-9_]((\/)*)(.*)(\/)$"
     required: false
