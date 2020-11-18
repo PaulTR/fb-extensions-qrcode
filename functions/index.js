@@ -10,13 +10,6 @@ var request = require('request').defaults({
   encoding: null
 });
 
-var ChangeType;
-
-(function (ChangeType) {
-    ChangeType[ChangeType["CREATE"] = 0] = "CREATE";
-    ChangeType[ChangeType["DELETE"] = 1] = "DELETE";
-    ChangeType[ChangeType["UPDATE"] = 2] = "UPDATE";
-})(ChangeType || (ChangeType = {}));
 
 admin.initializeApp();
 
@@ -31,23 +24,7 @@ exports.fsqrcodegenerator = functions.handler.firestore.document.onWrite(async (
         return;
     }
     id = change.after.id;
-    const changeType = getChangeType(change);
-    try {
-        switch (changeType) {
-            case ChangeType.CREATE:
-                console.log("create");
-                await handleCreateDocument(change.after);
-                break;
-            case ChangeType.DELETE:
-                console.log("delete");
-                await handleDeleteDocument(change.before);
-                break;
-            case ChangeType.UPDATE:
-                console.log("update");
-                await handleUpdateDocument(change.before, change.after);
-                break;
-        }
-    }
+    await handleCreateDocument(change.after);
     catch (err) {
         console.log("QR Code Generator extension error: " + err);
     }
@@ -76,17 +53,6 @@ const handleCreateDocument = async (snapshot) => {
     }
 };
 
-const handleDeleteDocument = async (snapshot) => {
-	var path = snapshot.get(config_1.default.outputFieldName + "/" + "realtive_path");
-    var bucketRef = getBucket(config_1.default.bucket);
-    await deleteItem(bucketRef, path);
-};
-
-const deleteItem = async function(bucketRef, path) {
-    console.log("trying to delete");
-    await bucketRef.file(path).delete();
-}
-
 const uploadTmpFile = function(snapshot) {
     var bucketRef = getBucket(config_1.default.bucket);
     var destination = (config_1.default.storageDirectoryPath == undefined ? "" : config_1.default.storageDirectoryPath) + id + '.png';
@@ -102,23 +68,6 @@ const uploadTmpFile = function(snapshot) {
         }
     )});
 }
-
-const handleUpdateDocument = async (before, after) => {
-    const inputAfter = extractInput(after);
-    const inputBefore = extractInput(before);
-    const inputHasChanged = inputAfter !== inputBefore;
-    if (!inputHasChanged &&
-        inputAfter !== undefined &&
-        inputBefore !== undefined) {
-            return;
-        }
-    if (inputAfter) {
-    	var url = createQRCodeUrl(inputAfter);
-        downloadFile(url, tmpFileLocation, async function() {
-            uploadTmpFile(after);
-        });
-    }
-};
 
 const getBucket = function(bucketName) {
   if( bucketName == undefined ) {
