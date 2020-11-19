@@ -19,7 +19,6 @@ exports.default = {
     location: process.env.LOCATION,
     inputFieldName: process.env.INPUT_FIELD_NAME,
     outputFieldName: process.env.OUTPUT_FIELD_NAME,
-    outputEncoding: process.env.CHOE,
     bucket: process.env.BUCKET,
     storageDirectoryPath: process.env.STORAGE_DIRECTORY_PATH,
 };

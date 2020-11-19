@@ -24,7 +24,7 @@ const tmpFileLocation = '/tmp/newfile.png';
 var id;
 
 exports.fsqrcodegenerator = functions.handler.firestore.document.onWrite(async (change) => {
-    const { inputFieldName, outputFieldName, outputEncoding, bucket, storageDirectoryPath } = config_1.default;
+    const { inputFieldName, outputFieldName, bucket, storageDirectoryPath } = config_1.default;
 
     if (inputFieldName == outputFieldName) {
         console.log("QR Code Generator: input field cannot be the same as output field. Please reconfigure your extension.");
@@ -132,10 +132,7 @@ const getBucket = function(bucketName) {
 }
 
 const createQRCodeUrl = function(input) {
-    return 'https://chart.googleapis.com/chart?cht=qr' +
-          '&chs=177x177' +
-          '&chl=' + input +
-          '&choe=' + config_1.default.outputEncoding;
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + input
 };
 
 const downloadFile = async function(uri, filename, callback){
