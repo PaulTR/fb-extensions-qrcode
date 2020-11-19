@@ -69,10 +69,6 @@ const getChangeType = (change) => {
 const handleCreateDocument = async (snapshot) => {
     const input = extractInput(snapshot);
     if (input) {
-    	// var url = createQRCodeUrl(input);
-     //    downloadFile(url, tmpFileLocation, async function() {
-     //        uploadTmpFile(snapshot);
-     //    });
 
         QRCode.toFile(tmpFileLocation, input, function (err) {
             uploadTmpFile(snapshot);
