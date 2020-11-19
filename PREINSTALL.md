@@ -2,7 +2,7 @@ Use this extension to convert text written to a Cloud Firestore collection to a 
 
 This extension listens to your specified Cloud Firestore collection. If you add a string to a specified field in any document within that collection, this extension:
 
-- Converts the text into a QR code png image using the [QR Code Generator API](https://goqr.me/api).
+- Converts the text into a QR code png image.
 - Saves the converted QR code image to Firebase Storage.
 - Saves the path for the image in Firestore.
 

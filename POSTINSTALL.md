@@ -14,7 +14,7 @@ You can test out this extension right away!
 
 Whenever you write a string to the field `${param:INPUT_FIELD_NAME}` in `${param:COLLECTION_PATH}`, this extension does the following:
 
-- Converts the text into a QR code png image using the [QR Code Generator API](https://goqr.me/api).
+- Converts the text into a QR code png image.
 - Saves the converted QR code image to Firebase Storage.
 - Saves the path for the image in Firestore.
 
