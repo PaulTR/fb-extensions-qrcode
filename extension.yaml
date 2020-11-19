@@ -1,0 +1,113 @@
+name: qr-code-generator
+version: 0.0.1
+specVersion: v1beta  # Firebase Extensions specification version (do not edit)
+
+displayName: QR Code Generator
+description: Generates a QR code for text entered into a given Firestore property and saves it to Firebase Storage.
+
+license: Apache-2.0  # The license you want for the extension
+
+#sourceUrl: #TODO https://github.com/firebase/extensions/tree/master/firestore-translate-text
+#releaseNotesUrl: #TODO https://github.com/firebase/extensions/blob/master/firestore-translate-text/CHANGELOG.md
+
+author:
+  authorName: Firebase
+  url: https://firebase.google.com
+
+contributors:
+  - authorName: Paul Ruiz
+    email: ptruiz@google.com
+    url: https://github.com/paultr
+
+billingRequired: true
+
+roles:
+  - role: datastore.user
+    reason: Allows the extension to write to your Firestore Database instance.
+  - role: storage.objectAdmin
+    reason: Allows the extension to write/change/delete data from your Firebase Storage instance.
+
+resources:
+  - name: fsqrcodegenerator
+    type: firebaseextensions.v1beta.function
+    description:
+      Listens to a field in Firestore documents and turns the text from those fields into QR codes, then saves them as images in Firebase Storage before leaving a reference link to that QR code in the triggering Firestore document.
+    properties:
+      location: ${LOCATION}
+      runtime: nodejs12
+      eventTrigger:
+        eventType: providers/cloud.firestore/eventTypes/document.write
+        resource: projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION_PATH}/{messageId}
+
+params:
+  - param: LOCATION
+    label: Cloud Functions location
+    description: >
+      Where do you want to deploy the functions created for this extension?
+      You usually want a location close to your database. For help selecting a
+      location, refer to the [location selection
+      guide](https://firebase.google.com/docs/functions/locations).
+    type: select
+    options:
+      - label: Iowa (us-central1)
+        value: us-central1
+      - label: South Carolina (us-east1)
+        value: us-east1
+      - label: Northern Virginia (us-east4)
+        value: us-east4
+      - label: Belgium (europe-west1)
+        value: europe-west1
+      - label: London (europe-west2)
+        value: europe-west2
+      - label: Frankfurt (europe-west3)
+        value: europe-west3
+      - label: Hong Kong (asia-east2)
+        value: asia-east2
+      - label: Tokyo (asia-northeast1)
+        value: asia-northeast1
+    default: us-central1
+    required: true
+    immutable: true
+
+  - param: COLLECTION_PATH
+    label: Collection path
+    description: >
+      Collection where you will write the data that will be turned into QR code images.
+    example: items
+    validationRegex: "^[^/]+(/[^/]+/[^/]+)*$"
+    validationErrorMessage: Must be a valid Cloud Firestore Collection
+    default: items
+    required: true
+
+  - param: INPUT_FIELD_NAME
+    label: Input field name
+    description: >
+      What field will have the text that will be converted into a QR code image?
+    example: qr
+    default: qr
+    required: true
+
+  - param: OUTPUT_FIELD_NAME
+    label: QR code location field name
+    description: >
+      What is the name of the field where you want to store your sentiment information?
+    example: qrCodeStorageLocation
+    default: qrCodeStorageLocation
+    required: true
+
+  - param: BUCKET
+    label: Firestore Bucket
+    description: >
+      In which bucket would you like to store your QR code images? Leave empty for the default bucket.
+    example: your-project-name or blank
+    default: 
+    required: false
+
+  - param: STORAGE_DIRECTORY_PATH
+    label: Firestore Directory
+    description: >
+      In which folder would you like to store your QR code images? Leave empty for the root node. Path must not start with a /, and must include a trailing /.
+    example: images/qrcodes/
+    default: 
+    validationRegex: "" #I don't know how to regex apparently - getting unknown escape character error ^[a-zA-Z0-9_]((\/)*)(.*)(\/)$"
+    required: false
