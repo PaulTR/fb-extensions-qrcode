@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("./config");
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const QRCode = require('qrcode')
 
 var fs = require('fs');
 var request = require('request').defaults({
@@ -11,6 +12,8 @@ var request = require('request').defaults({
 });
 
 var ChangeType;
+
+//https://www.npmjs.com/package/qrcode#tofilepath-text-options-cberror
 
 (function (ChangeType) {
     ChangeType[ChangeType["CREATE"] = 0] = "CREATE";
@@ -66,8 +69,12 @@ const getChangeType = (change) => {
 const handleCreateDocument = async (snapshot) => {
     const input = extractInput(snapshot);
     if (input) {
-    	var url = createQRCodeUrl(input);
-        downloadFile(url, tmpFileLocation, async function() {
+    	// var url = createQRCodeUrl(input);
+     //    downloadFile(url, tmpFileLocation, async function() {
+     //        uploadTmpFile(snapshot);
+     //    });
+
+        QRCode.toFile(tmpFileLocation, input, function (err) {
             uploadTmpFile(snapshot);
         });
     }
@@ -111,13 +118,12 @@ const handleUpdateDocument = async (before, after) => {
             return;
         }
     if( inputBefore ) {
-        var path = snapshot.data()[config_1.default.outputFieldName]['relative_path'];
+        var path = before.data()[config_1.default.outputFieldName]['relative_path'];
         var bucketRef = getBucket(config_1.default.bucket);
         await deleteItem(bucketRef, path);
     }
     if (inputAfter) {
-    	var url = createQRCodeUrl(inputAfter);
-        downloadFile(url, tmpFileLocation, async function() {
+        QRCode.toFile(tmpFileLocation, input, function (err) {
             uploadTmpFile(after);
         });
     }
@@ -130,13 +136,3 @@ const getBucket = function(bucketName) {
     return admin.storage().bucket(bucketName);
   } 
 }
-
-const createQRCodeUrl = function(input) {
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + input
-};
-
-const downloadFile = async function(uri, filename, callback){
-  await request.head(uri, function(err, res, body){
-    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-  });
-};
